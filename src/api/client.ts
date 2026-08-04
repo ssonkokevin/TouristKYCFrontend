@@ -1,20 +1,83 @@
 const API_BASE = import.meta.env.VITE_API_URL || "/api/v1";
 
+// Log the resolved API base once on load so misconfigured VITE_API_URL is
+// immediately visible in the browser console.
+// eslint-disable-next-line no-console
+console.info("[api] API_BASE resolved to:", API_BASE);
+
+let requestSeq = 0;
+
+async function reportToBackend(entry: Record<string, unknown>) {
+  try {
+    await fetch(`${API_BASE}/logs/frontend`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
+  } catch {
+    // Backend itself may be unreachable (the exact failure we're trying to
+    // trace) — never let logging throw or block the caller.
+  }
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const id = ++requestSeq;
+  const method = options.method || "GET";
+  const url = `${API_BASE}${path}`;
+  const startedAt = performance.now();
+
+  // eslint-disable-next-line no-console
+  console.groupCollapsed(`[api #${id}] ${method} ${url}`);
+  // eslint-disable-next-line no-console
+  console.log("request", { method, url, body: options.body });
+
   const token = localStorage.getItem("token");
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+    });
+  } catch (err: any) {
+    const durationMs = Math.round(performance.now() - startedAt);
+    // A thrown TypeError here (e.g. "Failed to fetch") means the request
+    // never reached the server — CORS, DNS, SSL, or network connectivity
+    // issue, as opposed to an HTTP error response (handled below).
+    // eslint-disable-next-line no-console
+    console.error("network error", { name: err?.name, message: err?.message, durationMs, apiBase: API_BASE });
+    console.groupEnd();
+    reportToBackend({
+      level: "error",
+      message: `API ${method} ${path} network error: ${err?.message || err}`,
+      context: { url, errorName: err?.name, durationMs, apiBase: API_BASE },
+    });
+    throw err;
+  }
+
+  const durationMs = Math.round(performance.now() - startedAt);
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: "Request failed" }));
+    // eslint-disable-next-line no-console
+    console.error("response error", { status: res.status, durationMs, body });
+    console.groupEnd();
+    reportToBackend({
+      level: "error",
+      message: `API ${method} ${path} failed with HTTP ${res.status}`,
+      context: { url, status: res.status, durationMs, body },
+    });
     throw new Error(body.error || `HTTP ${res.status}`);
   }
-  return res.json() as Promise<T>;
+
+  const data = (await res.json()) as T;
+  // eslint-disable-next-line no-console
+  console.log("response ok", { status: res.status, durationMs });
+  console.groupEnd();
+  return data;
 }
 
 export async function login(email: string, password: string) {
@@ -100,19 +163,56 @@ export async function markNotificationRead(id: string) {
 }
 
 export async function uploadDocument(subscriberId: string, type: string, file: File) {
+  const url = `${API_BASE}/documents/subscribers/${subscriberId}/${type}`;
+  const startedAt = performance.now();
+  // eslint-disable-next-line no-console
+  console.groupCollapsed(`[api] POST ${url}`);
+  // eslint-disable-next-line no-console
+  console.log("request", { fileName: file.name, fileSize: file.size, mimeType: file.type });
+
   const token = localStorage.getItem("token");
   const formData = new FormData();
   formData.append("file", file);
-  const res = await fetch(`${API_BASE}/documents/subscribers/${subscriberId}/${type}`, {
-    method: "POST",
-    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: formData,
-  });
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: formData,
+    });
+  } catch (err: any) {
+    const durationMs = Math.round(performance.now() - startedAt);
+    // eslint-disable-next-line no-console
+    console.error("network error", { name: err?.name, message: err?.message, durationMs, apiBase: API_BASE });
+    console.groupEnd();
+    reportToBackend({
+      level: "error",
+      message: `Upload document network error: ${err?.message || err}`,
+      context: { url, errorName: err?.name, durationMs, apiBase: API_BASE },
+    });
+    throw err;
+  }
+
+  const durationMs = Math.round(performance.now() - startedAt);
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: "Upload failed" }));
+    // eslint-disable-next-line no-console
+    console.error("response error", { status: res.status, durationMs, body });
+    console.groupEnd();
+    reportToBackend({
+      level: "error",
+      message: `Upload document failed with HTTP ${res.status}`,
+      context: { url, status: res.status, durationMs, body },
+    });
     throw new Error(body.error || `HTTP ${res.status}`);
   }
-  return res.json();
+
+  const data = await res.json();
+  // eslint-disable-next-line no-console
+  console.log("response ok", { status: res.status, durationMs });
+  console.groupEnd();
+  return data;
 }
 
 export async function deleteDocument(subscriberId: string, type: string) {
@@ -171,13 +271,7 @@ export async function logFrontendError(
   message: string,
   context?: Record<string, unknown>
 ): Promise<void> {
-  try {
-    await fetch(`${API_BASE}/logs/frontend`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ level: "error", message, context }),
-    });
-  } catch {
-    // silently ignore — logging should not break the app
-  }
+  // eslint-disable-next-line no-console
+  console.error("[app]", message, context);
+  await reportToBackend({ level: "error", message, context });
 }

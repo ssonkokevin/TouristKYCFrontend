@@ -13,16 +13,22 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSuccess = async (credentialResponse: any) => {
+    console.log("[login] Google credential response received", {
+      hasCredential: !!credentialResponse.credential,
+    });
     if (!credentialResponse.credential) {
       toast({ title: "Login failed", description: "No credential received", variant: "destructive" });
       return;
     }
     setIsLoading(true);
     try {
+      console.log("[login] exchanging Google credential with backend /auth/google");
       const { token, user } = await loginWithGoogle(credentialResponse.credential);
+      console.log("[login] backend login succeeded", { userId: user?.id, email: user?.email });
       setAuth(token, user);
       navigate("/");
     } catch (err: any) {
+      console.error("[login] backend login failed", { name: err?.name, message: err?.message });
       toast({
         title: "Login failed",
         description: err.message || "Only @hamiltel.com accounts are permitted to sign in.",
