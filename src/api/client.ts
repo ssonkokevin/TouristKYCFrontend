@@ -24,6 +24,13 @@ export async function login(email: string, password: string) {
   });
 }
 
+export async function loginWithGoogle(idToken: string) {
+  return request<{ token: string; user: any }>("/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ idToken }),
+  });
+}
+
 export async function getMe() {
   return request<{ id: string; email: string; name: string; role: string }>("/auth/me");
 }

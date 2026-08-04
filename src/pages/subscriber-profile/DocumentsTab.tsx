@@ -4,10 +4,10 @@ import { uploadDocument, deleteDocument } from "@/api/client";
 import { useToast } from "@/components/ui/use-toast";
 
 const DOC_TYPES = [
-  { type: "application_form", label: "Application Form", icon: FileText, field: "applicationFormUrl" },
-  { type: "passport_bio_page", label: "Passport Bio Page", icon: BookUser, field: "passportBioPageUrl" },
-  { type: "visa_page", label: "Visa Page", icon: StickyNote, field: "visaPageUrl" },
-  { type: "subscriber_photo", label: "Subscriber Photo", icon: Camera, field: "subscriberPhotoUrl" },
+  { type: "application_form", label: "Application Form", icon: FileText },
+  { type: "passport_bio_page", label: "Passport Bio Page", icon: BookUser },
+  { type: "visa_page", label: "Visa Page", icon: StickyNote },
+  { type: "subscriber_photo", label: "Subscriber Photo", icon: Camera },
 ] as const;
 
 export function DocumentsTab({ subscriber, onChanged }: { subscriber: any; onChanged: () => void }) {
@@ -43,8 +43,8 @@ export function DocumentsTab({ subscriber, onChanged }: { subscriber: any; onCha
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {DOC_TYPES.map(({ type, label, icon: Icon, field }) => {
-        const url = subscriber[field];
+      {DOC_TYPES.map(({ type, label, icon: Icon }) => {
+        const url = subscriber.documents?.[type]?.url;
         const busy = busyType === type;
         return (
           <div key={type} className="bg-white rounded-xl border border-slate-200 p-4 flex flex-col items-center text-center">
