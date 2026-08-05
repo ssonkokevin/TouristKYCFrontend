@@ -1,29 +1,29 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
-import { ShieldCheck, Building2 } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { loginWithGoogle } from "@/api/client";
+import { login } from "@/api/client";
 import { useToast } from "@/components/ui/use-toast";
 
 export function LoginPage() {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSuccess = async (credentialResponse: any) => {
-    console.log("[login] Google credential response received", {
-      hasCredential: !!credentialResponse.credential,
-    });
-    if (!credentialResponse.credential) {
-      toast({ title: "Login failed", description: "No credential received", variant: "destructive" });
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!identifier || !password) {
+      toast({ title: "Login failed", description: "Username and password are required", variant: "destructive" });
       return;
     }
     setIsLoading(true);
     try {
-      console.log("[login] exchanging Google credential with backend /auth/google");
-      const { token, user } = await loginWithGoogle(credentialResponse.credential);
+      console.log("[login] submitting credentials to /auth/login");
+      const { token, user } = await login(identifier, password);
       console.log("[login] backend login succeeded", { userId: user?.id, email: user?.email });
       setAuth(token, user);
       navigate("/");
@@ -31,7 +31,7 @@ export function LoginPage() {
       console.error("[login] backend login failed", { name: err?.name, message: err?.message });
       toast({
         title: "Login failed",
-        description: err.message || "Only @hamiltel.com accounts are permitted to sign in.",
+        description: err.message || "Invalid username or password.",
         variant: "destructive",
       });
     } finally {
@@ -56,20 +56,57 @@ export function LoginPage() {
             <p className="mt-1 text-sm text-slate-500">Sign in to access the KYC and SIM registration system</p>
           </div>
 
-          <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={() =>
-                toast({ title: "Login failed", description: "Google sign-in failed", variant: "destructive" })
-              }
-              useOneTap
-              width="320"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="identifier" className="mb-1.5 block text-sm font-medium text-slate-700">
+                Username
+              </label>
+              <input
+                id="identifier"
+                type="text"
+                autoComplete="username"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                placeholder="admin@hamiltel.ug"
+                disabled={isLoading}
+              />
+            </div>
 
-          {isLoading && (
-            <p className="mt-4 text-center text-sm text-slate-500">Signing you in&hellip;</p>
-          )}
+            <div>
+              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-700">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 pr-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isLoading ? "Signing you in…" : "Sign In"}
+            </button>
+          </form>
 
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-slate-200" />
@@ -79,16 +116,10 @@ export function LoginPage() {
 
           <div className="space-y-3 rounded-lg bg-slate-50 p-4">
             <div className="flex items-start gap-3">
-              <Building2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-500" />
-              <p className="text-sm text-slate-600">
-                Restricted to <span className="font-medium text-slate-900">@hamiltel.com</span> Google Workspace
-                accounts.
-              </p>
-            </div>
-            <div className="flex items-start gap-3">
               <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-500" />
               <p className="text-sm text-slate-600">
-                First time signing in? Your account is created automatically — no separate registration needed.
+                Accounts are provisioned internally by your system administrator — there is no self-service
+                registration.
               </p>
             </div>
           </div>

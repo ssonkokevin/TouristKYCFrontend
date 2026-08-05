@@ -80,19 +80,23 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return data;
 }
 
-export async function login(email: string, password: string) {
+export async function login(identifier: string, password: string) {
   return request<{ token: string; user: any }>("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ identifier, password }),
   });
 }
 
-export async function loginWithGoogle(idToken: string) {
-  return request<{ token: string; user: any }>("/auth/google", {
-    method: "POST",
-    body: JSON.stringify({ idToken }),
-  });
-}
+// Google Sign-In is disabled on the backend (plain-HTTP, no-domain
+// deployment can't satisfy Google's HTTPS-origin requirement). Kept as a
+// commented reference rather than deleted in case it's reintroduced later
+// alongside TLS.
+// export async function loginWithGoogle(idToken: string) {
+//   return request<{ token: string; user: any }>("/auth/google", {
+//     method: "POST",
+//     body: JSON.stringify({ idToken }),
+//   });
+// }
 
 export async function getMe() {
   return request<{ id: string; email: string; name: string; role: string }>("/auth/me");
