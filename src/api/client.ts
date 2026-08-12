@@ -70,6 +70,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       message: `API ${method} ${path} failed with HTTP ${res.status}`,
       context: { url, status: res.status, durationMs, body },
     });
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      throw new Error("Session expired. Please log in again.");
+    }
     throw new Error(body.error || `HTTP ${res.status}`);
   }
 
@@ -209,6 +215,12 @@ export async function uploadDocument(subscriberId: string, type: string, file: F
       message: `Upload document failed with HTTP ${res.status}`,
       context: { url, status: res.status, durationMs, body },
     });
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      throw new Error("Session expired. Please log in again.");
+    }
     throw new Error(body.error || `HTTP ${res.status}`);
   }
 

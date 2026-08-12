@@ -11,12 +11,12 @@ import { SubscriberProfilePage } from "@/pages/subscriber-profile/SubscriberProf
 import { SimInventoryPage } from "@/pages/SimInventory";
 import { MsisdnPoolPage } from "@/pages/MsisdnPool";
 import { ReportsPage } from "@/pages/Reports";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, isTokenValid } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/toaster";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { token } = useAuth();
-  return token ? children : <Navigate to="/login" replace />;
+  return token && isTokenValid(token) ? children : <Navigate to="/login" replace />;
 }
 
 export default function App() {
