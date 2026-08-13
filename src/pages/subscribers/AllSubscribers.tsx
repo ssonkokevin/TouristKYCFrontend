@@ -10,9 +10,9 @@ import { Users, Download, X } from "lucide-react";
 import { formatDateTimeEAT, formatDateEAT } from "@/lib/formatDate";
 
 const STATUS_COLORS: Record<string, string> = {
-  active: "bg-emerald-100 text-emerald-700",
-  suspended: "bg-amber-100 text-amber-700",
-  deregistered: "bg-red-100 text-red-700",
+  active: "bg-kyc-brand-tint text-kyc-brand",
+  suspended: "bg-kyc-warning-tint text-kyc-warning",
+  deregistered: "bg-kyc-danger-tint text-kyc-danger",
 };
 
 const STATUS_OPTIONS = [
@@ -128,8 +128,8 @@ export function AllSubscribersPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">All Subscribers</h1>
-        <span className="ml-2 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-600">{total}</span>
+        <h1 className="text-2xl font-bold text-kyc-text-primary">All Subscribers</h1>
+        <span className="ml-2 rounded-full bg-kyc-brand-tint px-2.5 py-0.5 text-xs font-medium text-kyc-brand">{total}</span>
         <Button
           onClick={handleExport}
           disabled={exporting}
@@ -142,7 +142,7 @@ export function AllSubscribersPage() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-4">
+      <div className="bg-white rounded-card shadow-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Name</Label>
@@ -193,7 +193,7 @@ export function AllSubscribersPage() {
           <span className="text-sm">{hasFilters ? "No subscribers match your filters" : "No subscribers yet"}</span>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-card shadow-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">
@@ -209,7 +209,7 @@ export function AllSubscribersPage() {
               {rows.map((sub: any) => (
                 <TableRow
                   key={sub.id}
-                  className="hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="hover:bg-kyc-brand-tint/40 transition-colors cursor-pointer"
                   onClick={() => navigate(`/subscribers/${sub.id}`)}
                 >
                   <TableCell className="font-medium text-slate-900">{sub.surname} {sub.otherNames}</TableCell>

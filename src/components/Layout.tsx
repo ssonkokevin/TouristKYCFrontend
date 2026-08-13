@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -14,14 +14,22 @@ import { NotificationBell } from "@/components/NotificationBell";
 
 function navClass({ isActive }: { isActive: boolean }) {
   return `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-    isActive ? "bg-emerald-600 text-white" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+    isActive ? "bg-kyc-brand-tint text-kyc-brand" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
 }
 
 function subNavClass({ isActive }: { isActive: boolean }) {
   return `block rounded-lg px-3 py-1.5 pl-9 text-sm transition-colors ${
-    isActive ? "bg-emerald-50 text-emerald-700 font-medium" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+    isActive ? "bg-kyc-brand-tint text-kyc-brand font-medium" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
   }`;
+}
+
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-kyc-text-secondary bg-kyc-bg">
+      {children}
+    </div>
+  );
 }
 
 export function Layout() {
@@ -33,11 +41,11 @@ export function Layout() {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-screen overflow-hidden bg-kyc-bg">
       {/* Sidebar */}
-      <aside className="flex w-64 flex-col border-r border-slate-200 bg-white">
-        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-200">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white">
+      <aside className="flex w-64 flex-col border-r border-kyc-border bg-white">
+        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-kyc-border">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-kyc-brand text-white">
             <ShieldCheck className="h-4 w-4" />
           </div>
           <div>
@@ -51,6 +59,8 @@ export function Layout() {
             <LayoutDashboard className="h-4 w-4" />
             Dashboard
           </NavLink>
+
+          <SectionLabel>Records</SectionLabel>
 
           <button
             onClick={() => setSubscribersOpen((o) => !o)}
@@ -96,15 +106,17 @@ export function Layout() {
             </div>
           )}
 
+          <SectionLabel>System</SectionLabel>
+
           <NavLink to="/reports" className={navClass}>
             <BarChart3 className="h-4 w-4" />
             Reports
           </NavLink>
         </nav>
 
-        <div className="border-t border-slate-200 p-3">
+        <div className="border-t border-kyc-border p-3">
           <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-kyc-brand-tint text-kyc-brand text-xs font-bold">
               {user?.name?.[0]?.toUpperCase() ?? "A"}
             </div>
             <div className="min-w-0 flex-1">
@@ -124,7 +136,7 @@ export function Layout() {
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center justify-end gap-3 border-b border-slate-200 bg-white px-6 py-3">
+        <header className="flex items-center justify-end gap-3 border-b border-kyc-border bg-white px-6 py-3">
           <NotificationBell />
         </header>
         <main className="flex-1 overflow-auto">

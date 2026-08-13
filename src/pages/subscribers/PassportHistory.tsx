@@ -55,7 +55,7 @@ export function PassportHistoryPage() {
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">
-      <h1 className="text-2xl font-bold text-slate-900">Passport History</h1>
+      <h1 className="text-2xl font-bold text-kyc-text-primary">Passport History</h1>
       <p className="text-sm text-slate-500">
         Look up every SIM ever registered under a passport number. Tourists are limited to 10 SIM registrations per passport.
       </p>
@@ -123,7 +123,7 @@ export function PassportHistoryPage() {
               <span className="text-sm">No records found for this passport</span>
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-card shadow-card overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50 hover:bg-slate-50">
@@ -138,7 +138,7 @@ export function PassportHistoryPage() {
                   {result.records.map((r: any) => (
                     <TableRow
                       key={r.subscriber_id}
-                      className="hover:bg-slate-50 transition-colors cursor-pointer"
+                      className="hover:bg-kyc-brand-tint/40 transition-colors cursor-pointer"
                       onClick={() => navigate(`/subscribers/${r.subscriber_id}`)}
                     >
                       <TableCell className="font-medium text-slate-900">{r.name}</TableCell>

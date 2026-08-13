@@ -142,15 +142,15 @@ export function SuspensionsPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Suspensions</h1>
-        <span className="ml-2 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-600">{total}</span>
+        <h1 className="text-2xl font-bold text-kyc-text-primary">Suspensions</h1>
+        <span className="ml-2 rounded-full bg-kyc-warning-tint px-2.5 py-0.5 text-xs font-medium text-kyc-warning">{total}</span>
         <Button onClick={handleExport} disabled={exporting} variant="outline" size="sm" className="ml-auto gap-1.5">
           <Download className="h-3.5 w-3.5" />
           {exporting ? "Exporting…" : "Export CSV"}
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-4">
+      <div className="bg-white rounded-card shadow-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Name</Label>
@@ -198,7 +198,7 @@ export function SuspensionsPage() {
           <span className="text-sm">{hasFilters ? "No suspensions match your filters" : "No suspended subscribers"}</span>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-card shadow-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">
@@ -216,7 +216,7 @@ export function SuspensionsPage() {
             </TableHeader>
             <TableBody>
               {rows.map((row: any, idx: number) => (
-                <TableRow key={row.subscriberId} className="hover:bg-slate-50 transition-colors">
+                <TableRow key={row.subscriberId} className="hover:bg-kyc-brand-tint/40 transition-colors">
                   <TableCell className="text-slate-500 text-sm">{idx + 1}</TableCell>
                   <TableCell
                     className="font-medium text-slate-900 cursor-pointer hover:underline"
@@ -231,7 +231,7 @@ export function SuspensionsPage() {
                     {row.subscriber?.visaExpiryDate ? new Date(row.subscriber.visaExpiryDate).toLocaleDateString() : "—"}
                   </TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                    <span className="inline-flex items-center rounded-full bg-kyc-warning-tint px-2.5 py-0.5 text-xs font-medium text-kyc-warning">
                       {REASON_LABELS[row.reason] ?? row.reason}
                     </span>
                   </TableCell>

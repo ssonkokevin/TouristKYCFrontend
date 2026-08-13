@@ -38,11 +38,30 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        kyc: {
+          bg: "var(--kyc-bg)",
+          surface: "var(--kyc-surface)",
+          border: "var(--kyc-border)",
+          "text-primary": "var(--kyc-text-primary)",
+          "text-secondary": "var(--kyc-text-secondary)",
+          brand: "var(--kyc-brand)",
+          "brand-tint": "var(--kyc-brand-tint)",
+          warning: "var(--kyc-warning)",
+          "warning-tint": "var(--kyc-warning-tint)",
+          danger: "var(--kyc-danger)",
+          "danger-tint": "var(--kyc-danger-tint)",
+          info: "var(--kyc-info)",
+          "info-tint": "var(--kyc-info-tint)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        card: "var(--kyc-radius-card)",
+      },
+      boxShadow: {
+        card: "var(--kyc-shadow-card)",
       },
       keyframes: {
         "accordion-down": {

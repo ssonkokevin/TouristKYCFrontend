@@ -13,11 +13,11 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Users, Smartphone, Phone, TrendingUp } from "lucide-react";
+import { Users, Smartphone, Phone, TrendingUp, Inbox, PieChart as PieChartIcon } from "lucide-react";
 import { listSubscribers, listSimInventory, listMsisdnPool } from "@/api/client";
 import { useToast } from "@/components/ui/use-toast";
 
-const COLORS = ["#3B82F6", "#22C55E", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
+const COLORS = ["#0F9D58", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
@@ -85,27 +85,27 @@ export function OverviewPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Page heading */}
-      <h1 className="text-2xl font-bold text-slate-900">Overview</h1>
+      <h1 className="text-2xl font-bold text-kyc-text-primary">Overview</h1>
 
       {/* Stat cards — responsive 2→3→6 cols */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
         <StatCard
           icon={<Users className="h-5 w-5" />}
-          iconBg="bg-blue-50 text-blue-600"
+          tone="info"
           label="Total Subscribers"
           value={counts.subscribers}
           sub="Registered tourists"
         />
         <StatCard
           icon={<Smartphone className="h-5 w-5" />}
-          iconBg="bg-emerald-50 text-emerald-600"
+          tone="brand"
           label="SIM Inventory"
           value={counts.sims}
           sub="Cards in pool"
         />
         <StatCard
           icon={<Phone className="h-5 w-5" />}
-          iconBg="bg-amber-50 text-amber-600"
+          tone="warning"
           label="MSISDN Pool"
           value={counts.msisdns}
           sub="Numbers available"
@@ -115,32 +115,32 @@ export function OverviewPage() {
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Area chart — subscriber trend */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-card shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-semibold text-slate-900">Registration Trend</span>
-            <span className="ml-auto text-xs text-slate-400">This year</span>
+            <TrendingUp className="h-4 w-4 text-kyc-brand" />
+            <span className="text-sm font-semibold text-kyc-text-primary">Registration Trend</span>
+            <span className="ml-auto text-xs text-kyc-text-secondary">This year</span>
           </div>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.15} />
-                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#0F9D58" stopOpacity={0.15} />
+                    <stop offset="100%" stopColor="#0F9D58" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E2E8F0" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#94A3B8" }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#94A3B8" }} />
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} />
                 <Tooltip
-                  contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }}
-                  cursor={{ stroke: "#E2E8F0" }}
+                  contentStyle={{ borderRadius: 8, border: "1px solid #E5E7EB", fontSize: 12 }}
+                  cursor={{ stroke: "#E5E7EB" }}
                 />
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="#3B82F6"
+                  stroke="#0F9D58"
                   strokeWidth={2}
                   fill="url(#gradBlue)"
                 />
@@ -150,9 +150,9 @@ export function OverviewPage() {
         </div>
 
         {/* Horizontal bar chart — SIM by category */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-card shadow-card p-5">
           <div className="mb-4">
-            <span className="text-sm font-semibold text-slate-900">SIM by Category</span>
+            <span className="text-sm font-semibold text-kyc-text-primary">SIM by Category</span>
           </div>
           <div className="h-48">
             {simBuckets.length > 0 ? (
@@ -162,10 +162,10 @@ export function OverviewPage() {
                   data={simBuckets}
                   margin={{ top: 0, right: 8, left: 0, bottom: 0 }}
                 >
-                  <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="#E2E8F0" />
-                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#94A3B8" }} />
-                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#64748B" }} width={72} />
-                  <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
+                  <CartesianGrid horizontal={false} strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} width={72} />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E5E7EB", fontSize: 12 }} />
                   <Bar dataKey="count" maxBarSize={24} radius={[0, 4, 4, 0]}>
                     {simBuckets.map((_: any, idx: number) => (
                       <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
@@ -174,16 +174,19 @@ export function OverviewPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-slate-400">No data</div>
+              <div className="flex h-full flex-col items-center justify-center gap-2 text-kyc-text-secondary">
+                <Inbox className="h-6 w-6" />
+                <span className="text-sm">No data</span>
+              </div>
             )}
           </div>
         </div>
       </div>
 
       {/* Donut — MSISDN by status */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5">
+      <div className="bg-white rounded-card shadow-card p-5">
         <div className="mb-4">
-          <span className="text-sm font-semibold text-slate-900">MSISDN Status Distribution</span>
+          <span className="text-sm font-semibold text-kyc-text-primary">MSISDN Status Distribution</span>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <div className="h-52 w-52 flex-shrink-0">
@@ -213,11 +216,14 @@ export function OverviewPage() {
                       <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E5E7EB", fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-slate-400">No data</div>
+              <div className="flex h-full flex-col items-center justify-center gap-2 text-kyc-text-secondary">
+                <PieChartIcon className="h-6 w-6" />
+                <span className="text-sm">No data</span>
+              </div>
             )}
           </div>
           {/* Legend */}
@@ -236,16 +242,23 @@ export function OverviewPage() {
   );
 }
 
-function StatCard({ icon, iconBg, label, value, sub }: { icon: any; iconBg: string; label: string; value: number; sub: string }) {
+const TONE_CHIP: Record<string, string> = {
+  brand: "bg-kyc-brand-tint text-kyc-brand",
+  warning: "bg-kyc-warning-tint text-kyc-warning",
+  danger: "bg-kyc-danger-tint text-kyc-danger",
+  info: "bg-kyc-info-tint text-kyc-info",
+};
+
+function StatCard({ icon, tone, label, value, sub }: { icon: any; tone: "brand" | "warning" | "danger" | "info"; label: string; value: number; sub: string }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
-      <div className="flex items-start justify-between">
+    <div className="bg-white rounded-card shadow-card p-5">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-2xl font-bold text-slate-900">{value.toLocaleString()}</div>
-          <div className="mt-0.5 text-xs font-medium text-slate-500">{label}</div>
-          <div className="mt-0.5 text-xs text-slate-400">{sub}</div>
+          <div className="text-2xl font-bold text-kyc-text-primary">{value.toLocaleString()}</div>
+          <div className="mt-0.5 text-xs font-medium text-slate-600">{label}</div>
+          <div className="mt-0.5 text-xs text-kyc-text-secondary">{sub}</div>
         </div>
-        <div className={`p-2.5 rounded-lg ${iconBg}`}>{icon}</div>
+        <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] ${TONE_CHIP[tone]}`}>{icon}</div>
       </div>
     </div>
   );

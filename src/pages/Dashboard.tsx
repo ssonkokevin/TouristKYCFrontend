@@ -13,7 +13,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { Users, Smartphone, ShieldAlert, UserX, TrendingUp, AlertTriangle, Clock, AlertOctagon } from "lucide-react";
+import { Users, Smartphone, ShieldAlert, UserX, TrendingUp, AlertTriangle, Clock, AlertOctagon, Inbox, PieChart as PieChartIcon } from "lucide-react";
 import {
   getMetrics,
   getRegistrationTrend,
@@ -25,13 +25,24 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 
-const COLORS = ["#059669", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
+const COLORS = ["#0F9D58", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
 const RANGES: { key: "7d" | "1m" | "6m" | "1y"; label: string }[] = [
   { key: "7d", label: "7 Days" },
   { key: "1m", label: "1 Month" },
   { key: "6m", label: "6 Months" },
   { key: "1y", label: "1 Year" },
 ];
+
+function formatRelativeTime(date: Date | null): string {
+  if (!date) return "—";
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 10) return "just now";
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h ago`;
+}
 
 export function DashboardPage() {
   const [metrics, setMetrics] = useState<any>(null);
@@ -42,6 +53,8 @@ export function DashboardPage() {
   const [purpose, setPurpose] = useState<any[]>([]);
   const [alertCount, setAlertCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [, setTick] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -58,10 +71,16 @@ export function DashboardPage() {
         setNationality((n as any) ?? []);
         setPurpose((p as any) ?? []);
         setAlertCount((notif.data ?? []).length);
+        setLastUpdated(new Date());
       })
       .catch((err) => toast({ title: "Error loading dashboard", description: err.message, variant: "destructive" }))
       .finally(() => setLoading(false));
   }, [toast]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     getVisaExpiryAlerts(visaRange)
@@ -79,7 +98,13 @@ export function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">Tourist KYC Dashboard</h1>
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold text-kyc-text-primary">Tourist KYC Dashboard</h1>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-kyc-brand-tint px-2.5 py-1 text-xs font-medium text-kyc-brand">
+          <span className="h-1.5 w-1.5 rounded-full bg-kyc-brand" />
+          Updated {formatRelativeTime(lastUpdated)}
+        </span>
+      </div>
 
       {alertCount > 0 && (
         <Link
@@ -94,53 +119,53 @@ export function DashboardPage() {
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-        <StatCard icon={<Users className="h-5 w-5" />} iconBg="bg-emerald-50 text-emerald-600" label="Total Tourists" value={metrics?.total_tourists ?? 0} />
-        <StatCard icon={<Users className="h-5 w-5" />} iconBg="bg-blue-50 text-blue-600" label="Active" value={metrics?.active_sims ?? 0} />
-        <StatCard icon={<ShieldAlert className="h-5 w-5" />} iconBg="bg-amber-50 text-amber-600" label="Suspended" value={metrics?.suspended ?? 0} />
-        <StatCard icon={<UserX className="h-5 w-5" />} iconBg="bg-red-50 text-red-600" label="Deregistered" value={metrics?.deregistered ?? 0} />
-        <StatCard icon={<Clock className="h-5 w-5" />} iconBg="bg-orange-50 text-orange-500" label="Expiring ≤7 days" value={metrics?.expiring_soon ?? 0} highlight={metrics?.expiring_soon > 0} />
-        <StatCard icon={<AlertOctagon className="h-5 w-5" />} iconBg="bg-rose-50 text-rose-600" label="Visa Expired (active)" value={metrics?.visa_expired_active ?? 0} highlight={metrics?.visa_expired_active > 0} />
-        <StatCard icon={<Smartphone className="h-5 w-5" />} iconBg="bg-violet-50 text-violet-600" label="SIM Stock" value={metrics?.sim_stock_available ?? 0} />
-        <StatCard icon={<Smartphone className="h-5 w-5" />} iconBg="bg-teal-50 text-teal-600" label="SIM Assigned" value={metrics?.sim_stock_assigned ?? 0} />
+        <StatCard icon={<Users className="h-5 w-5" />} tone="info" label="Total Tourists" value={metrics?.total_tourists ?? 0} sub="Updated today" />
+        <StatCard icon={<Users className="h-5 w-5" />} tone="brand" label="Active" value={metrics?.active_sims ?? 0} sub={`of ${metrics?.total_tourists ?? 0} total`} />
+        <StatCard icon={<ShieldAlert className="h-5 w-5" />} tone="warning" label="Suspended" value={metrics?.suspended ?? 0} sub="Updated today" />
+        <StatCard icon={<UserX className="h-5 w-5" />} tone="danger" label="Deregistered" value={metrics?.deregistered ?? 0} sub="Updated today" />
+        <StatCard icon={<Clock className="h-5 w-5" />} tone="warning" label="Expiring ≤7 days" value={metrics?.expiring_soon ?? 0} highlight={metrics?.expiring_soon > 0} sub="Next 7 days" />
+        <StatCard icon={<AlertOctagon className="h-5 w-5" />} tone="danger" label="Visa Expired (active)" value={metrics?.visa_expired_active ?? 0} highlight={metrics?.visa_expired_active > 0} sub="Needs action" />
+        <StatCard icon={<Smartphone className="h-5 w-5" />} tone="info" label="SIM Stock" value={metrics?.sim_stock_available ?? 0} sub="Available now" />
+        <StatCard icon={<Smartphone className="h-5 w-5" />} tone="brand" label="SIM Assigned" value={metrics?.sim_stock_assigned ?? 0} sub="Updated today" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Registration trend */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-card shadow-card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-4 w-4 text-emerald-600" />
-            <span className="text-sm font-semibold text-slate-900">Registration Trend (Last 30 days)</span>
+            <TrendingUp className="h-4 w-4 text-kyc-brand" />
+            <span className="text-sm font-semibold text-kyc-text-primary">Registration Trend (Last 30 days)</span>
           </div>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#059669" stopOpacity={0.15} />
-                    <stop offset="100%" stopColor="#059669" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#0F9D58" stopOpacity={0.15} />
+                    <stop offset="100%" stopColor="#0F9D58" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E2E8F0" />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#94A3B8" }} interval={4} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#94A3B8" }} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} cursor={{ stroke: "#E2E8F0" }} />
-                <Area type="monotone" dataKey="count" stroke="#059669" strokeWidth={2} fill="url(#gradGreen)" />
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} interval={4} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E5E7EB", fontSize: 12 }} cursor={{ stroke: "#E5E7EB" }} />
+                <Area type="monotone" dataKey="count" stroke="#0F9D58" strokeWidth={2} fill="url(#gradGreen)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Visa expiry with range filter */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-card shadow-card p-5">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-semibold text-slate-900">Visa Expiry</span>
-            <div className="flex rounded-lg border border-slate-200 p-0.5">
+            <span className="text-sm font-semibold text-kyc-text-primary">Visa Expiry</span>
+            <div className="flex rounded-lg border border-kyc-border p-0.5">
               {RANGES.map((r) => (
                 <button
                   key={r.key}
                   onClick={() => setVisaRange(r.key)}
                   className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
-                    visaRange === r.key ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100"
+                    visaRange === r.key ? "bg-kyc-brand text-white" : "text-slate-500 hover:bg-slate-100"
                   }`}
                 >
                   {r.label}
@@ -151,30 +176,33 @@ export function DashboardPage() {
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={visaData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E2E8F0" />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#94A3B8" }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#94A3B8" }} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#6B7280" }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #E5E7EB", fontSize: 12 }} />
                 <Bar dataKey="expiring" fill="#F59E0B" radius={[4, 4, 0, 0]} maxBarSize={20} name="Expiring" />
                 <Bar dataKey="active" fill="#CBD5E1" radius={[4, 4, 0, 0]} maxBarSize={20} name="Still active" />
               </BarChart>
             </ResponsiveContainer>
           </div>
           <div className="flex items-center gap-4 mt-2 justify-center">
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-500" /><span className="text-xs text-slate-500">Expiring</span></div>
-            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-slate-300" /><span className="text-xs text-slate-500">Still active</span></div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-kyc-warning" /><span className="text-xs text-kyc-text-secondary">Expiring</span></div>
+            <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-slate-300" /><span className="text-xs text-kyc-text-secondary">Still active</span></div>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Nationality distribution */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-card shadow-card p-5">
           <div className="mb-4">
-            <span className="text-sm font-semibold text-slate-900">Nationality Distribution</span>
+            <span className="text-sm font-semibold text-kyc-text-primary">Nationality Distribution</span>
           </div>
           {nationality.length === 0 ? (
-            <div className="flex h-32 items-center justify-center text-sm text-slate-400">No data</div>
+            <div className="flex h-32 flex-col items-center justify-center gap-2 text-kyc-text-secondary">
+              <Inbox className="h-6 w-6" />
+              <span className="text-sm">No data</span>
+            </div>
           ) : (
             <div className="space-y-3">
               {nationality.slice(0, 8).map((n: any, idx: number) => {
@@ -196,9 +224,9 @@ export function DashboardPage() {
         </div>
 
         {/* Purpose of visit donut */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-card shadow-card p-5">
           <div className="mb-4">
-            <span className="text-sm font-semibold text-slate-900">Purpose of Visit</span>
+            <span className="text-sm font-semibold text-kyc-text-primary">Purpose of Visit</span>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="h-44 w-44 flex-shrink-0">
@@ -232,7 +260,10 @@ export function DashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center text-sm text-slate-400">No data</div>
+                <div className="flex h-full flex-col items-center justify-center gap-2 text-kyc-text-secondary">
+                  <PieChartIcon className="h-6 w-6" />
+                  <span className="text-sm">No data</span>
+                </div>
               )}
             </div>
             <div className="flex flex-wrap gap-3">
@@ -251,15 +282,37 @@ export function DashboardPage() {
   );
 }
 
-function StatCard({ icon, iconBg, label, value, highlight }: { icon: any; iconBg: string; label: string; value: number; highlight?: boolean }) {
+const TONE_CHIP: Record<string, string> = {
+  brand: "bg-kyc-brand-tint text-kyc-brand",
+  warning: "bg-kyc-warning-tint text-kyc-warning",
+  danger: "bg-kyc-danger-tint text-kyc-danger",
+  info: "bg-kyc-info-tint text-kyc-info",
+};
+
+function StatCard({
+  icon,
+  tone,
+  label,
+  value,
+  sub,
+  highlight,
+}: {
+  icon: any;
+  tone: "brand" | "warning" | "danger" | "info";
+  label: string;
+  value: number;
+  sub: string;
+  highlight?: boolean;
+}) {
   return (
-    <div className={`bg-white rounded-xl border p-4 ${highlight ? "border-rose-300 ring-1 ring-rose-200" : "border-slate-200"}`}>
-      <div className="flex items-start justify-between">
+    <div className={`bg-white rounded-card shadow-card p-5 ${highlight ? "ring-1 ring-kyc-danger/30" : ""}`}>
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className={`text-xl font-bold ${highlight ? "text-rose-600" : "text-slate-900"}`}>{value.toLocaleString()}</div>
-          <div className="mt-0.5 text-xs font-medium text-slate-500">{label}</div>
+          <div className={`text-2xl font-bold ${highlight ? "text-kyc-danger" : "text-kyc-text-primary"}`}>{value.toLocaleString()}</div>
+          <div className="mt-0.5 text-xs font-medium text-slate-600">{label}</div>
+          <div className="mt-0.5 text-xs text-kyc-text-secondary">{sub}</div>
         </div>
-        <div className={`p-2 rounded-lg ${iconBg}`}>{icon}</div>
+        <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] ${TONE_CHIP[tone]}`}>{icon}</div>
       </div>
     </div>
   );
