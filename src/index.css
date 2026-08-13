@@ -56,3 +56,41 @@
     @apply text-slate-900 antialiased;
   }
 }
+
+@layer components {
+  .console-grid-bg {
+    background-image:
+      linear-gradient(to right, rgba(15, 157, 88, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15, 157, 88, 0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .console-grid-bg-light {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .glass-chip {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(12px);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.6s ease-out forwards;
+}
