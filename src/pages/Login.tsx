@@ -1,14 +1,9 @@
-import { useState, FormEvent, type ReactNode } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShieldCheck, Mail, Lock, Eye, EyeOff, AlertCircle, FileCheck2, Smartphone, BellRing } from "lucide-react";
+import { ShieldCheck, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { login } from "@/api/client";
-
-const FEATURE_CHIPS = [
-  { icon: <FileCheck2 className="h-4 w-4" />, label: "Passport & Visa Verification" },
-  { icon: <Smartphone className="h-4 w-4" />, label: "SIM Card Registration" },
-  { icon: <BellRing className="h-4 w-4" />, label: "Visa Expiry Monitoring" },
-];
+import loginHero from "@/assets/login-hero.png";
 
 export function LoginPage() {
   const { setAuth } = useAuth();
@@ -135,27 +130,16 @@ export function LoginPage() {
       </div>
 
       {/* Right panel — visual */}
-      <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-kyc-brand via-emerald-700 to-slate-900 lg:flex lg:items-center lg:justify-center">
+      <div className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-kyc-brand via-emerald-700 to-slate-900 lg:flex lg:items-center lg:justify-center lg:p-12">
         <div className="console-grid-bg-light absolute inset-0" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-        <div className="relative z-10 flex flex-col gap-4 px-12">
-          {FEATURE_CHIPS.map((chip, idx) => (
-            <FeatureChip key={chip.label} icon={chip.icon} label={chip.label} delay={idx * 150} />
-          ))}
+        <div className="glass-chip animate-fade-in-up relative z-10 max-w-xl overflow-hidden rounded-card shadow-card">
+          <img
+            src={loginHero}
+            alt="Tourist KYC Portal — passport verification, SIM registration, and secure connectivity for travelers"
+            className="block w-full"
+          />
         </div>
       </div>
-    </div>
-  );
-}
-
-function FeatureChip({ icon, label, delay }: { icon: ReactNode; label: string; delay: number }) {
-  return (
-    <div
-      className="glass-chip animate-fade-in-up flex items-center gap-3 rounded-card px-4 py-3 text-sm font-medium text-white"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white/15">{icon}</span>
-      {label}
     </div>
   );
 }
