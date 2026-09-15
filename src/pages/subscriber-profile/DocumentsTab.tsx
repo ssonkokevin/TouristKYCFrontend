@@ -75,7 +75,7 @@ export function DocumentsTab({ subscriber, onChanged }: { subscriber: any; onCha
             />
             <div className="flex items-center gap-2 text-xs">
               {url && (
-                <a href={url} target="_blank" rel="noreferrer" className="text-emerald-600 hover:underline font-medium">
+                <a href={url} target="_blank" rel="noreferrer" className="text-kyc-brand hover:underline font-medium">
                   View
                 </a>
               )}

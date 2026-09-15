@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, Download, X } from "lucide-react";
 import { formatDateTimeEAT } from "@/lib/formatDate";
+import { PageHeader } from "@/components/kyc/PageHeader";
 
 const REASON_LABELS: Record<string, string> = {
   visa_expired: "Visa Expired",
@@ -140,17 +141,15 @@ export function SuspensionsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-kyc-text-primary">Suspensions</h1>
-        <span className="ml-2 rounded-full bg-kyc-warning-tint px-2.5 py-0.5 text-xs font-medium text-kyc-warning">{total}</span>
-        <Button onClick={handleExport} disabled={exporting} variant="outline" size="sm" className="ml-auto gap-1.5">
+    <div className="space-y-6">
+      <PageHeader title="Suspensions" subtitle="Subscribers currently suspended." count={total} countTone="warning">
+        <Button onClick={handleExport} disabled={exporting} variant="outline" size="sm" className="gap-1.5">
           <Download className="h-3.5 w-3.5" />
           {exporting ? "Exporting…" : "Export CSV"}
         </Button>
-      </div>
+      </PageHeader>
 
-      <div className="bg-white rounded-card shadow-card p-4">
+      <div className="rounded-2xl border border-kyc-border bg-white shadow-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Name</Label>
@@ -190,7 +189,7 @@ export function SuspensionsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-slate-200 border-t-kyc-brand rounded-full animate-spin" />
         </div>
       ) : rows.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
@@ -198,7 +197,7 @@ export function SuspensionsPage() {
           <span className="text-sm">{hasFilters ? "No suspensions match your filters" : "No suspended subscribers"}</span>
         </div>
       ) : (
-        <div className="bg-white rounded-card shadow-card overflow-hidden">
+        <div className="rounded-2xl border border-kyc-border bg-white shadow-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">

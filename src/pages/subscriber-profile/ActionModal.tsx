@@ -30,7 +30,7 @@ export function ActionModal({ title, reasons, confirmLabel, destructive, onCance
           <select
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-kyc-brand"
           >
             {reasons.map((r) => (
               <option key={r.value} value={r.value}>
@@ -46,7 +46,7 @@ export function ActionModal({ title, reasons, confirmLabel, destructive, onCance
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={3}
-            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-kyc-brand"
           />
         </div>
 
@@ -57,7 +57,7 @@ export function ActionModal({ title, reasons, confirmLabel, destructive, onCance
           <Button
             size="sm"
             variant={destructive ? "destructive" : "default"}
-            className={!destructive ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+            className={!destructive ? "bg-kyc-brand hover:bg-kyc-brand-deep" : ""}
             onClick={() => onConfirm(reason, note || undefined)}
           >
             {confirmLabel}

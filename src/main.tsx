@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "@/App";
 import { AuthProvider } from "@/hooks/useAuth";
+import "leaflet/dist/leaflet.css";
 import "@/index.css";
 
 // Google Sign-In (GoogleOAuthProvider) removed — disabled deployment-wide,

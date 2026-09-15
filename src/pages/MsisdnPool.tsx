@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Phone } from "lucide-react";
+import { PageHeader } from "@/components/kyc/PageHeader";
 
 const MSISDN_STATUS: Record<string, string> = {
   available: "bg-kyc-brand-tint text-kyc-brand",
@@ -12,9 +13,9 @@ const MSISDN_STATUS: Record<string, string> = {
   deactivated: "bg-slate-100 text-slate-500",
 };
 
-function KpiCard({ label, value }: { label: string; value: number }) {
+function StatTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-white rounded-card shadow-card p-4">
+    <div className="rounded-2xl border border-kyc-border bg-white shadow-card p-4">
       <div className="text-2xl font-bold text-kyc-text-primary">{value.toLocaleString()}</div>
       <div className="mt-0.5 text-xs font-medium text-kyc-text-secondary">{label}</div>
     </div>
@@ -43,16 +44,13 @@ export function MsisdnPoolPage() {
   const activeCount = rows.filter((r: any) => r.status === "active").length;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-kyc-text-primary">MSISDN Pool</h1>
-        <span className="ml-2 rounded-full bg-kyc-brand-tint px-2.5 py-0.5 text-xs font-medium text-kyc-brand">{rows.length}</span>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title="MSISDN Pool" subtitle="Manage the pool of available numbers." count={rows.length} />
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <KpiCard label="Total Numbers" value={rows.length} />
-        <KpiCard label="Available" value={availableCount} />
-        <KpiCard label="Active" value={activeCount} />
+        <StatTile label="Total Numbers" value={rows.length} />
+        <StatTile label="Available" value={availableCount} />
+        <StatTile label="Active" value={activeCount} />
       </div>
 
       <Input placeholder="Search by MSISDN" value={search} onChange={(e: any) => setSearch(e.target.value)} className="max-w-sm" />
@@ -72,7 +70,7 @@ export function MsisdnPoolPage() {
           <span className="text-sm">No numbers match your search</span>
         </div>
       ) : (
-        <div className="bg-white rounded-card shadow-card overflow-hidden">
+        <div className="rounded-2xl border border-kyc-border bg-white shadow-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">

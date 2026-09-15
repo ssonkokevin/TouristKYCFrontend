@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Smartphone } from "lucide-react";
+import { PageHeader } from "@/components/kyc/PageHeader";
 
 const SIM_STATUS: Record<string, string> = {
   available: "bg-kyc-brand-tint text-kyc-brand",
@@ -13,9 +14,9 @@ const SIM_STATUS: Record<string, string> = {
   deactivated: "bg-slate-100 text-slate-500",
 };
 
-function KpiCard({ label, value }: { label: string; value: number }) {
+function StatTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-white rounded-card shadow-card p-4">
+    <div className="rounded-2xl border border-kyc-border bg-white shadow-card p-4">
       <div className="text-2xl font-bold text-kyc-text-primary">{value.toLocaleString()}</div>
       <div className="mt-0.5 text-xs font-medium text-kyc-text-secondary">{label}</div>
     </div>
@@ -54,17 +55,14 @@ export function SimInventoryPage() {
   const availableCount = rows.filter((r: any) => r.status === "available").length;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-kyc-text-primary">SIM Inventory</h1>
-        <span className="ml-2 rounded-full bg-kyc-brand-tint px-2.5 py-0.5 text-xs font-medium text-kyc-brand">{rows.length}</span>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title="SIM Inventory" subtitle="Manage SIM stock and assignments." count={rows.length} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiCard label="Total SIMs" value={rows.length} />
-        <KpiCard label="Assigned" value={assignedCount} />
-        <KpiCard label="Available" value={availableCount} />
-        <KpiCard label="Total Numbers" value={metrics?.sim_stock_available + metrics?.sim_stock_assigned || 0} />
+        <StatTile label="Total SIMs" value={rows.length} />
+        <StatTile label="Assigned" value={assignedCount} />
+        <StatTile label="Available" value={availableCount} />
+        <StatTile label="Total Numbers" value={metrics?.sim_stock_available + metrics?.sim_stock_assigned || 0} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -88,7 +86,7 @@ export function SimInventoryPage() {
           <span className="text-sm">No SIM cards match your search</span>
         </div>
       ) : (
-        <div className="bg-white rounded-card shadow-card overflow-hidden">
+        <div className="rounded-2xl border border-kyc-border bg-white shadow-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50 hover:bg-slate-50">

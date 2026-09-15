@@ -17,7 +17,7 @@ import { Users, Smartphone, Phone, TrendingUp, Inbox, PieChart as PieChartIcon }
 import { listSubscribers, listSimInventory, listMsisdnPool } from "@/api/client";
 import { useToast } from "@/components/ui/use-toast";
 
-const COLORS = ["#0F9D58", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
+const COLORS = ["#8A4B2F", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
@@ -126,8 +126,8 @@ export function OverviewPage() {
               <AreaChart data={trendData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#0F9D58" stopOpacity={0.15} />
-                    <stop offset="100%" stopColor="#0F9D58" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#8A4B2F" stopOpacity={0.15} />
+                    <stop offset="100%" stopColor="#8A4B2F" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#E5E7EB" />
@@ -140,7 +140,7 @@ export function OverviewPage() {
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="#0F9D58"
+                  stroke="#8A4B2F"
                   strokeWidth={2}
                   fill="url(#gradBlue)"
                 />

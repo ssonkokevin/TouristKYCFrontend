@@ -250,16 +250,48 @@ export async function getReportByNationality(from?: string, to?: string) {
   return request<any[]>(`/reports/by-nationality?${query}`);
 }
 
-export async function getNationalityDistribution() {
-  return request<any[]>(`/distributions/nationality`);
+export async function getNationalityDistribution(from?: string, to?: string) {
+  const query = new URLSearchParams({ ...(from ? { from } : {}), ...(to ? { to } : {}) }).toString();
+  return request<any[]>(`/distributions/nationality${query ? `?${query}` : ""}`);
 }
 
 export async function getPurposeDistribution() {
   return request<any[]>(`/distributions/purpose`);
 }
 
-export async function getStatusDistribution() {
-  return request<any[]>(`/distributions/status`);
+export async function getSimProvisioningTrend(from?: string, to?: string) {
+  const query = new URLSearchParams({ ...(from ? { from } : {}), ...(to ? { to } : {}) }).toString();
+  return request<{ label: string; count: number }[]>(`/reports/sim-provisioning-trend${query ? `?${query}` : ""}`);
+}
+
+/** Streams the Registrations CSV export from the backend and triggers a
+ * browser download — not routed through the generic JSON `request()` helper
+ * since the response body is CSV text, not JSON. */
+export async function exportRegistrationsCsv(registeredFrom?: string, registeredTo?: string) {
+  const query = new URLSearchParams({
+    ...(registeredFrom ? { registered_from: registeredFrom } : {}),
+    ...(registeredTo ? { registered_to: registeredTo } : {}),
+  }).toString();
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_BASE}/reports/registrations/export${query ? `?${query}` : ""}`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: "Export failed" }));
+    throw new Error(body.error || `Export failed (HTTP ${res.status})`);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "registrations_export.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function getStatusDistribution(from?: string, to?: string) {
+  const query = new URLSearchParams({ ...(from ? { from } : {}), ...(to ? { to } : {}) }).toString();
+  return request<any[]>(`/distributions/status${query ? `?${query}` : ""}`);
 }
 
 export async function getVisaExpiryAlerts(range: "7d" | "1m" | "6m" | "1y") {
@@ -268,8 +300,19 @@ export async function getVisaExpiryAlerts(range: "7d" | "1m" | "6m" | "1y") {
   );
 }
 
-export async function getRegistrationTrend(days: number) {
-  return request<{ label: string; count: number }[]>(`/alerts/trends/registrations?days=${days}`);
+export async function getRegistrationTrend(opts: number | { from: string; to: string }) {
+  const query = typeof opts === "number" ? `days=${opts}` : `from=${opts.from}&to=${opts.to}`;
+  return request<{ label: string; count: number }[]>(`/alerts/trends/registrations?${query}`);
+}
+
+export async function getSimInventorySummary() {
+  return request<{ status: { status: string; _count: { status: number } }[]; type: { type: string; _count: { type: number } }[] }>(
+    `/sim-inventory/summary`
+  );
+}
+
+export async function getMsisdnPoolSummary() {
+  return request<{ status: { status: string; _count: { status: number } }[] }>(`/msisdn-pool/summary`);
 }
 
 export async function getMetrics() {
@@ -280,6 +323,8 @@ export async function getMetrics() {
     deregistered: number;
     sim_stock_available: number;
     sim_stock_assigned: number;
+    expiring_soon: number;
+    visa_expired_active: number;
   }>(`/metrics`);
 }
 

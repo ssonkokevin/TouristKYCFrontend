@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PageHeader } from "@/components/kyc/PageHeader";
 
 const RECENT_KEY = "passport_history_recent_searches";
 
@@ -54,11 +55,11 @@ export function PassportHistoryPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-3xl">
-      <h1 className="text-2xl font-bold text-kyc-text-primary">Passport History</h1>
-      <p className="text-sm text-slate-500">
-        Look up every SIM ever registered under a passport number. Tourists are limited to 10 SIM registrations per passport.
-      </p>
+    <div className="max-w-3xl space-y-6">
+      <PageHeader
+        title="Passport History"
+        subtitle="Look up every SIM ever registered under a passport number. Tourists are limited to 10 SIM registrations per passport."
+      />
 
       <div className="relative">
         <div className="flex gap-2">
@@ -91,7 +92,7 @@ export function PassportHistoryPage() {
               </div>
             )}
           </div>
-          <Button onClick={() => search(query)} disabled={loading} className="bg-emerald-600 hover:bg-emerald-700">
+          <Button onClick={() => search(query)} disabled={loading} className="bg-kyc-brand hover:bg-kyc-brand-deep">
             {loading ? "Searching..." : "Search"}
           </Button>
         </div>
@@ -123,7 +124,7 @@ export function PassportHistoryPage() {
               <span className="text-sm">No records found for this passport</span>
             </div>
           ) : (
-            <div className="bg-white rounded-card shadow-card overflow-hidden">
+            <div className="rounded-2xl border border-kyc-border bg-white shadow-card overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50 hover:bg-slate-50">

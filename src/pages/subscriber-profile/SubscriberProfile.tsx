@@ -59,7 +59,7 @@ export function SubscriberProfilePage() {
   if (loading || !subscriber) {
     return (
       <div className="flex h-full items-center justify-center p-12">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-kyc-brand rounded-full animate-spin" />
       </div>
     );
   }
@@ -67,7 +67,7 @@ export function SubscriberProfilePage() {
   const msisdn = subscriber.msisdnPool?.[0]?.msisdn;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
@@ -105,7 +105,7 @@ export function SubscriberProfilePage() {
               key={t}
               onClick={() => setTab(t)}
               className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-                tab === t ? "border-emerald-600 text-emerald-700" : "border-transparent text-slate-500 hover:text-slate-800"
+                tab === t ? "border-kyc-brand text-kyc-brand" : "border-transparent text-slate-500 hover:text-slate-800"
               }`}
             >
               {t}
