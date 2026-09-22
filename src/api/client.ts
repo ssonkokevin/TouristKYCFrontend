@@ -66,7 +66,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     console.error("response error", { status: res.status, durationMs, body });
     console.groupEnd();
     reportToBackend({
-      level: "error",
+      level: res.status >= 500 ? "error" : "warn",
       message: `API ${method} ${path} failed with HTTP ${res.status}`,
       context: { url, status: res.status, durationMs, body },
     });
@@ -83,6 +83,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   // eslint-disable-next-line no-console
   console.log("response ok", { status: res.status, durationMs });
   console.groupEnd();
+  reportToBackend({
+    level: "info",
+    message: `API ${method} ${path} succeeded with HTTP ${res.status}`,
+    context: { url, status: res.status, durationMs },
+  });
   return data;
 }
 
