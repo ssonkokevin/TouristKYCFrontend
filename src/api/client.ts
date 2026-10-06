@@ -128,6 +128,10 @@ export async function listMsisdnPool(params?: Record<string, string>) {
   return request<{ data: any[]; meta: any }>(`/msisdn-pool?${query}`);
 }
 
+export async function releaseHeldMsisdn(id: string) {
+  return request<{ data: any }>(`/msisdn-pool/${id}/release-held`, { method: "POST" });
+}
+
 export async function getSubscriber(id: string) {
   return request<any>(`/subscribers/${id}`);
 }

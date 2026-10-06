@@ -1,15 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
-import { listMsisdnPool } from "@/api/client";
+import { listMsisdnPool, releaseHeldMsisdn } from "@/api/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Phone, RotateCcw } from "lucide-react";
 import { PageHeader } from "@/components/kyc/PageHeader";
 
 const MSISDN_STATUS: Record<string, string> = {
   available: "bg-kyc-brand-tint text-kyc-brand",
   reserved: "bg-kyc-info-tint text-kyc-info",
   active: "bg-kyc-brand-tint text-kyc-brand",
+  suspended: "bg-amber-100 text-amber-700",
+  held: "bg-orange-100 text-orange-700",
   deactivated: "bg-slate-100 text-slate-500",
 };
 
@@ -26,13 +29,19 @@ export function MsisdnPoolPage() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [releasingId, setReleasingId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
+  const loadRows = () => {
+    setLoading(true);
     listMsisdnPool({ limit: "100" })
       .then((res) => setRows(res.data ?? []))
       .catch((err) => toast({ title: "Error", description: err.message, variant: "destructive" }))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadRows();
   }, [toast]);
 
   const filtered = useMemo(
@@ -42,15 +51,36 @@ export function MsisdnPoolPage() {
 
   const availableCount = rows.filter((r: any) => r.status === "available").length;
   const activeCount = rows.filter((r: any) => r.status === "active").length;
+  const heldCount = rows.filter((r: any) => r.status === "held").length;
+
+  const handleReleaseHeld = async (id: string) => {
+    const target = rows.find((row) => row.id === id);
+    if (!target) return;
+
+    const confirmed = window.confirm(`Release ${target.msisdn} back to the MSISDN pool?`);
+    if (!confirmed) return;
+
+    setReleasingId(id);
+    try {
+      await releaseHeldMsisdn(id);
+      toast({ title: "MSISDN released", description: `${target.msisdn} is available again.` });
+      loadRows();
+    } catch (err: any) {
+      toast({ title: "Release failed", description: err.message, variant: "destructive" });
+    } finally {
+      setReleasingId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <PageHeader title="MSISDN Pool" subtitle="Manage the pool of available numbers." count={rows.length} />
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatTile label="Total Numbers" value={rows.length} />
         <StatTile label="Available" value={availableCount} />
         <StatTile label="Active" value={activeCount} />
+        <StatTile label="Held" value={heldCount} />
       </div>
 
       <Input placeholder="Search by MSISDN" value={search} onChange={(e: any) => setSearch(e.target.value)} className="max-w-sm" />
@@ -78,6 +108,7 @@ export function MsisdnPoolPage() {
                 <TableHead className="text-xs font-medium text-slate-500 uppercase tracking-wide">Category</TableHead>
                 <TableHead className="text-xs font-medium text-slate-500 uppercase tracking-wide">Status</TableHead>
                 <TableHead className="text-xs font-medium text-slate-500 uppercase tracking-wide">Subscriber</TableHead>
+                <TableHead className="text-xs font-medium text-slate-500 uppercase tracking-wide text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -91,6 +122,23 @@ export function MsisdnPoolPage() {
                     </span>
                   </TableCell>
                   <TableCell className="text-slate-500 text-sm">{item.subscriber?.surname ?? item.reservedBy ?? "—"}</TableCell>
+                  <TableCell className="text-right">
+                    {item.status === "held" ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => handleReleaseHeld(item.id)}
+                        disabled={releasingId === item.id}
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        {releasingId === item.id ? "Releasing..." : "Release"}
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-slate-400">—</span>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
