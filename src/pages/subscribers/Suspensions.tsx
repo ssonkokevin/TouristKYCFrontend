@@ -127,17 +127,12 @@ export function SuspensionsPage() {
     }
   };
 
-  const handleReactivate = async (id: string) => {
-    setBusyId(id);
-    try {
-      await reactivateSubscriber(id);
-      toast({ title: "Subscriber reactivated" });
-      load();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setBusyId(null);
-    }
+  const handleReactivate = async (_id: string) => {
+    toast({
+      title: "Reactivate unavailable",
+      description: "Subscriber reactivation is disabled until the BSAG reactivation API is implemented.",
+      variant: "destructive",
+    });
   };
 
   return (
@@ -240,10 +235,10 @@ export function SuspensionsPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={busyId === row.subscriberId}
+                      disabled
                       onClick={() => handleReactivate(row.subscriberId)}
                     >
-                      {busyId === row.subscriberId ? "..." : "Reactivate"}
+                      Reactivate (coming soon)
                     </Button>
                   </TableCell>
                 </TableRow>
